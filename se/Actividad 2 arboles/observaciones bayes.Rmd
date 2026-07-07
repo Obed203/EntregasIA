@@ -1,0 +1,85 @@
+---
+# Instalar e1071 (solo la primera vez)
+install.packages("e1071")
+
+# Cargar la librería
+library(e1071)
+
+# Leer la base de datos
+iris_data <- read.csv("iris.data (1).csv")
+
+# Verificar estructura
+str(iris_data)
+
+# Seleccionar aleatoriamente 20 observaciones
+set.seed(123)
+muestra <- sample(1:nrow(iris_data), 20)
+
+# Crear conjunto de entrenamiento y prueba
+train <- iris_data[-muestra, ]
+test <- iris_data[muestra, ]
+
+# Entrenar el modelo Naive Bayes
+modelo <- naiveBayes(clase ~ ., data = train)
+
+# Realizar las predicciones
+pred <- predict(modelo, test)
+
+# Orden deseado de las clases
+niveles <- c("Iris-setosa",
+             "Iris-virginica",
+             "Iris-versicolor")
+
+# Convertir a factores con el orden especificado
+pred <- factor(pred, levels = niveles)
+real <- factor(test$clase, levels = niveles)
+
+# Crear la matriz de confusión
+matriz <- table(Predicho = pred,
+                Real = real)
+
+# Mostrar la matriz
+cat("MATRIZ DE CONFUSIÓN\n")
+print(matriz)
+
+# Calcular la exactitud
+accuracy <- sum(diag(matriz)) / sum(matriz)
+
+cat("\nExactitud del modelo:", round(accuracy * 100, 2), "%\n")
+
+# Mostrar las 20 observaciones evaluadas
+resultado <- data.frame(
+  Observacion = muestra,
+  Real = test$clase,
+  Prediccion = pred
+)
+
+cat("\nRESULTADOS DE LAS 20 OBSERVACIONES\n")
+print(resultado)title: "observaciones bayes"
+output: html_document
+date: "2026-07-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
