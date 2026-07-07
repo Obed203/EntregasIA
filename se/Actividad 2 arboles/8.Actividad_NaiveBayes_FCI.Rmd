@@ -1,0 +1,55 @@
+---
+title: "Actividad Naive Bayes FCI"
+output: 
+ html_document:
+    collapse: true
+    smooth_scroll: true
+    theme: journal
+    highlight: kate
+    df_print: paged
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#Carga de librerías
+library(e1071)
+library(caret)
+
+datos <- data.frame(
+  TiempoEstudio = factor(c("Alto", "Medio", "Bajo", "Alto", "Medio", "Alto", "Bajo", "Medio", "Alto", "Bajo",
+                           "Alto", "Bajo", "Medio", "Alto", "Medio", "Bajo", "Alto", "Alto", "Medio", "Bajo",
+                           "Medio", "Alto", "Bajo", "Medio", "Alto")),
+  Asistencia = factor(c("Alta", "Media", "Baja", "Alta", "Media", "Alta", "Baja", "Alta", "Media", "Baja",
+                        "Alta", "Baja", "Media", "Alta", "Alta", "Baja", "Alta", "Media", "Alta", "Baja",
+                        "Media", "Alta", "Baja", "Media", "Alta")),
+  Participacion = factor(c("Alta", "Baja", "Baja", "Media", "Media", "Alta", "Baja", "Media", "Alta", "Media",
+                           "Alta", "Baja", "Media", "Alta", "Media", "Baja", "Alta", "Alta", "Media", "Baja",
+                           "Media", "Alta", "Baja", "Media", "Alta")),
+  SituacionEcon = factor(c("Buena", "Mala", "Mala", "Buena", "Buena", "Buena", "Mala", "Buena", "Buena", "Mala",
+                           "Buena", "Mala", "Buena", "Buena", "Buena", "Mala", "Buena", "Buena", "Buena", "Mala",
+                           "Buena", "Buena", "Mala", "Buena", "Buena")),
+  Rendimiento = factor(c("Excelente", "Regular", "Deficiente", "Bueno", "Bueno", "Excelente", "Deficiente", "Bueno", "Excelente", "Regular",
+                         "Excelente", "Deficiente", "Bueno", "Excelente", "Bueno", "Deficiente", "Excelente", "Excelente", "Bueno", "Deficiente",
+                         "Bueno", "Excelente", "Deficiente", "Bueno", "Excelente"))
+)
+
+#División 80/20
+set.seed(123)
+index <- createDataPartition(datos$Rendimiento, p = 0.8, list = FALSE)
+train <- datos[index, ]
+test <- datos[-index, ]
+
+# Modelo
+modelo_nb <- naiveBayes(Rendimiento ~ ., data = train)
+modelo_nb
+
+# Predicción
+preds <- predict(modelo_nb, test)
+
+# Matriz de confusión
+confusionMatrix(preds, test$Rendimiento)

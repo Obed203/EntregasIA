@@ -1,0 +1,66 @@
+---
+title: "Aplicación de naive Bayes al conjunto de datos iris"
+output: 
+ html_document:
+    collapse: true
+    smooth_scroll: true
+    theme: journal
+    highlight: kate
+    df_print: paged
+    code_folding: show
+---
+
+El modelo recibe el calificativo de "Ingenuo" (Naive) debido a que asume la independencia condicional entre todas las variables de entrada. Aunque esta premisa simplifica la realidad biológica, permite obtener modelos computacionalmente eficientes y altamente escalables. Para variables continuas como las del dataset Iris, el modelo emplea la distribución gaussiana (normal) para estimar la probabilidad de cada característica dentro de cada clase.
+
+```{r}
+# 1. Carga de librerías
+library(e1071)
+library(caret)
+library(ggplot2)
+```
+
+```{r}
+# 2. Carga y preparación de datos
+data(iris)
+set.seed(123) 
+index <- createDataPartition(iris$Species, p=0.8, list=FALSE)
+train_data <- iris[index, ]
+test_data  <- iris[-index, ]
+```
+
+ Explicación Teórica (Integrada).
+ El clasificador Naive Bayes se basa en la fórmula: 
+ $$P(c | x1...xn) = [P(c) * P(x1|c) * ... * P(xn|c)] / P(x1...xn)$$
+ Asume independencia entre variables y, para datos continuos como Iris,
+ utiliza la distribución Gaussiana para calcular la probabilidad.
+
+```{r}
+# 3. Visualización exploratoria
+ggplot(iris, aes(x = Petal.Length, fill = Species)) +
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  labs(title = "Distribución de Longitud de Pétalo por Especie")
+```
+
+```{r}
+# 4. Entrenamiento del modelo
+#consiste en calcular los parámetros estadísticos (media y desviación estándar) de cada especie basándose en el conjunto de entrenamiento
+
+modelo_nb <- naiveBayes(Species ~ ., data = train_data)
+print("Resumen del modelo:")
+print(modelo_nb)
+```
+
+```{r}
+# 5. Predicción y Evaluación
+#La matriz de confusión es la herramienta estándar para medir la eficacia del clasificador, permitiéndonos identificar no solo el porcentaje de aciertos, sino también la naturaleza de los errores de clasificación.
+
+predicciones <- predict(modelo_nb, test_data)
+matriz_conf <- confusionMatrix(predicciones, test_data$Species)
+print("Resultados de la clasificación:")
+print(matriz_conf)
+```
+
+Conclusión.
+La matriz de confusión muestra el desempeño. Si los valores en la diagonal
+son altos, el modelo clasifica correctamente la mayoría de las flores.
