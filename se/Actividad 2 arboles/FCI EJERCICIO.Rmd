@@ -1,0 +1,75 @@
+---
+set.seed(2026)
+n <- 80
+
+horas <- sample(c("Alto", "Medio", "Bajo"), n, replace = TRUE, prob = c(0.3, 0.5, 0.2))
+asistencia <- sample(c("Frecuente", "Ocasional", "Nula"), n, replace = TRUE)
+participacion <- sample(c("Alta", "Media", "Baja"), n, replace = TRUE)
+logica <- sample(c("Avanzada", "Intermedia", "Basica"), n, replace = TRUE)
+
+rendimiento <- character(n)
+
+for (i in 1:n) {
+  puntaje <- 0
+  if (horas[i] == "Alto") puntaje <- puntaje + 3 else if (horas[i] == "Medio") puntaje <- puntaje + 2 else puntaje <- puntaje + 1
+  if (asistencia[i] == "Frecuente") puntaje <- puntaje + 3 else if (asistencia[i] == "Ocasional") puntaje <- puntaje + 2 else puntaje <- puntaje + 1
+  if (participacion[i] == "Alta") puntaje <- puntaje + 2 else if (participacion[i] == "Media") puntaje <- puntaje + 1 else puntaje <- puntaje + 0
+  if (logica[i] == "Avanzada") puntaje <- puntaje + 3 else if (logica[i] == "Intermedia") puntaje <- puntaje + 2 else puntaje <- puntaje + 1
+  
+  if (puntaje >= 10) rendimiento[i] <- "Sobresaliente"
+  else if (puntaje >= 7) rendimiento[i] <- "Aceptable"
+  else rendimiento[i] <- "Insuficiente"
+}
+
+datos_sistemas <- data.frame(HorasProgramacion = horas,
+                             AsistenciaLaboratorio = asistencia,
+                             ParticipacionClase = participacion,
+                             NivelLogica = logica,
+                             Rendimiento = rendimiento,
+                             stringsAsFactors = TRUE)
+
+head(datos_sistemas)
+
+library(e1071)
+library(caret)
+
+set.seed(101)
+indice <- createDataPartition(datos_sistemas$Rendimiento, p = 0.75, list = FALSE)
+train_data <- datos_sistemas[indice, ]
+test_data <- datos_sistemas[-indice, ]
+
+modelo_nb <- naiveBayes(Rendimiento ~ ., data = train_data, laplace = 1)
+print(modelo_nb)
+
+prediccion <- predict(modelo_nb, test_data)
+matriz_conf <- confusionMatrix(prediccion, as.factor(test_data$Rendimiento))
+
+print(matriz_conf)
+cat("La precisión (Accuracy) del modelo es:", round(matriz_conf$overall['Accuracy'] * 100, 2), "%")title: "FCI EJERCICIO"
+output: html_document
+date: "2026-07-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
